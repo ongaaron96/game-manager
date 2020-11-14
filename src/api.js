@@ -1,9 +1,12 @@
+require('dotenv').config()
 let express = require('express')
-let bodyParser = require('body-parser');
-let mongoose = require('mongoose');
-let apiRoutes = require("./api-routes")
+let bodyParser = require('body-parser')
+let mongoose = require('mongoose')
+let apiRoutes = require('./api-routes')
+let serverless = require('serverless-http')
 
-mongoose.connect('mongodb://localhost/game-manager', { 
+mongoose.connect(process.env.MONGODB_URI || 
+    'mongodb://localhost/game-manager', { 
     useNewUrlParser: true, 
     useUnifiedTopology: true
 });
@@ -23,10 +26,12 @@ app.use(bodyParser.json());
 
 // Configure API routes
 app.get('/', (req, res) => res.send('Hello World with Express'));
-app.use('/api', apiRoutes)
+app.use('/.netlify/functions/api', apiRoutes)
 
 // Listen to specified port
-let port = process.env.PORT || 8080;
+const port = process.env.PORT || 8080;
 app.listen(port, function () {
      console.log("Running game-manager on port " + port);
 });
+
+module.exports.handler = serverless(app)
