@@ -12,7 +12,7 @@ exports.getAll = function (req, res) {
         }
         res.json({
             status: "success",
-            message: "All Game info retrieved successfully",
+            message: "All Game info retrieved successfully!!!",
             data: games
         });
     });
