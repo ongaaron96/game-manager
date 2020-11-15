@@ -9,14 +9,7 @@ mongoose.connect(process.env.MONGODB_URI ||
     'mongodb://localhost/game-manager', { 
     useNewUrlParser: true, 
     useUnifiedTopology: true
-});
-let db = mongoose.connection;
-
-if (!db) {
-    console.log("Error connecting to MongoDB")
-} else {
-    console.log("Success connecting to MongoDB")
-}
+}).connection;
 
 let app = express();
 

@@ -5,13 +5,9 @@ Game = require('./gameModel');
 exports.getAll = function (req, res) {
     Game.get(function (err, games) {
         if (err) {
-            res.json({
-                status: "error",
-                message: err,
-            });
+            res.json({ message: err });
         }
         res.json({
-            status: "success",
             message: "All Game info retrieved successfully!!!",
             data: games
         });
@@ -26,10 +22,9 @@ exports.new = function (req, res) {
     game.owned = req.body.owned;
     game.played = req.body.played;
     game.rating = req.body.rating;
-    // save the game and check for errors
     game.save(function (err) {
         if (err)
-            res.json(err);
+            res.json({ message: err });
         res.json({
             message: 'New Game info created!',
             data: game
@@ -40,33 +35,46 @@ exports.new = function (req, res) {
 // Retrieve single game info
 exports.getSingle = function (req, res) {
     Game.findById(req.params.game_id, function (err, game) {
-        if (err)
-            res.send(err);
-        res.json({
-            message: 'Game info loading..',
-            data: game
-        });
+        if (err) {
+            res.status(404).json({ 
+                message: "Game not found",
+                game_id: req.params.game_id
+            });
+        } else {
+            res.json({
+                message: 'Game info loading..',
+                data: game
+            });
+        }
     });
 };
+
 // Update game info
 exports.update = function (req, res) {
     Game.findById(req.params.game_id, function (err, game) {
-        if (err)
-            res.send(err);
-        game.title = req.body.title ? req.body.title : game.title;
-        game.platform = req.body.platform;
-        game.owned = req.body.owned;
-        game.played = req.body.played;
-        game.rating = req.body.rating;
-        // save the game and check for errors
-        game.save(function (err) {
-            if (err)
-                res.json(err);
-            res.json({
-                message: 'Game info updated',
-                data: game
+        if (err) {
+            res.status(404).json({ 
+                message: "Game not found",
+                game_id: req.params.game_id
             });
-        });
+        } else {
+            game.title = req.body.title ? req.body.title : game.title;
+            game.platform = req.body.platform;
+            game.owned = req.body.owned;
+            game.played = req.body.played;
+            game.rating = req.body.rating;
+    
+            game.save(function (err) {
+                if (err) {
+                    res.json({ message: err });
+                } else {
+                    res.json({
+                        message: 'Game info updated',
+                        data: game
+                    });
+                }
+            });
+        }
     });
 };
 
@@ -75,23 +83,29 @@ exports.deleteSingle = function (req, res) {
     Game.remove({
         _id: req.params.game_id
     }, function (err, game) {
-        if (err)
-            res.send(err);
-        res.json({
-            status: "success",
-            message: 'Game info deleted'
-        });
+        if (err) {
+            res.status(404).json({ 
+                message: "Game not found",
+                game_id: req.params.game_id
+            });
+        } else {
+            res.json({
+                message: 'Game info deleted',
+                game_id: req.params.game_id
+            });
+        }
     });
 };
 
 // Delete all game info
 exports.deleteAll = function (req, res) {
     Game.remove({}, function (err) {
-        if (err)
-            res.send(err);
-        res.json({
-            status: "success",
-            message: 'All Game info deleted'
-        });
+        if (err) {
+            res.json({ message: err });
+        } else {
+            res.json({
+                message: 'All Game info deleted'
+            });
+        }
     });
 };
